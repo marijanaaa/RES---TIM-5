@@ -1,0 +1,37 @@
+create table tip_veze(
+    id integer not null,
+    naziv varchar(30),
+    primary key (id),
+    unique (id)
+);
+
+create table vrsta_radnika(
+    id integer not null,
+    vrsta varchar(30),
+    primary key (id),
+    unique (id)
+);
+
+create table radnik(
+	jmbg integer not null,
+    ime varchar(30),
+    opis varchar(150),
+    id_vrsta integer not null,
+    primary key(jmbg),
+    unique(jmbg),
+    foreign key (id_vrsta) references vrsta_radnika(id)
+);
+
+create table odnos_radnika(
+	id integer not null,
+    radnik1 integer not null,
+    radnik2 integer not null,
+    id_veza integer not null,
+    primary key(id),
+    unique(id),
+    foreign key (radnik1) references radnik(jmbg),
+    foreign key (radnik2) references radnik(jmbg),
+    foreign key (id_veza) references tip_veze(id)
+);
+
+commit;

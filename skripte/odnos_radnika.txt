@@ -1,0 +1,22 @@
+insert into odnos_radnika (id, radnik1, radnik2, id_veza) values (
+	1,
+    1003,
+    4566,
+    1
+);
+
+insert into odnos_radnika (id, radnik1, radnik2, id_veza) values (
+	2,
+    9699,
+    4566,
+    1
+);
+
+insert into odnos_radnika (id, radnik1, radnik2, id_veza) values (
+	3,
+    8978,
+    3323,
+    2
+);
+
+commit;

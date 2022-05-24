@@ -1,0 +1,43 @@
+insert into radnik (jmbg, ime, opis, id_vrsta) values (
+	4556,
+    "Milena",
+    "Doktorka u odeljenju za pulmologiju",
+    1
+);
+
+insert into radnik (jmbg, ime, opis, id_vrsta) values (
+	8978,
+    "Dragan",
+    "Doktor u odeljenju za dermatologiju",
+    1
+);
+
+insert into radnik (jmbg, ime, opis, id_vrsta) values (
+	3323,
+    "Sara",
+    "Doktorka u odeljenju za oftamologiju",
+    1
+);
+
+insert into radnik (jmbg, ime, opis, id_vrsta) values (
+	4566,
+    "Petar",
+    "Medicinski tehnicar  u odeljenju za pedijatriju",
+    2
+);
+
+insert into radnik (jmbg, ime, opis, id_vrsta) values (
+	9699,
+    "Ivana",
+    "Medicinski tehnicar  u odeljenju za kardiologiju",
+    2
+);
+
+insert into radnik (jmbg, ime, opis, id_vrsta) values (
+	1003,
+    "Ana",
+    "Medicinski tehnicar  u odeljenju za ginekologiju",
+    2
+);
+
+commit;
