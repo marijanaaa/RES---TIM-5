@@ -7,70 +7,65 @@ class XMLDateBaseAdapter:
         self.repository = repository
 
     def GetMethod(self, x):
-
         with open(x, 'r') as f:
-            data = f.read() 
-
-        # Passing the stored data inside the beautifulsoup parser 
-        bs_data = BeautifulSoup(data, 'xml') 
-        # Using find() to extract attributes of the first instance of the tag 
+            data = f.read()
+        bs_data = BeautifulSoup(data, 'xml')
         resursTag = bs_data.find("noun")  #izvadi mi ceo tag
         resurs = resursTag.text #iyvadi mi tekst iz taga
-
         returnTag = bs_data.find("fields")  #izvadi mi ceo tag
-        returnC = returnTag.text #iyvadi mi tekst iz taga
-        returnCNiz = returnC.split(";")
-
         sql = "SELECT "
+        if (returnTag is None):
+            sql+="*"
 
-        for x in returnCNiz:
+        else:
+            returnC = returnTag.text #iyvadi mi tekst iz taga
+
+            returnCNiz = returnC.split(";")
+            for x in returnCNiz:
                 sql += x + ","
-
-        sql = sql[:-1]
+            sql = sql[:-1]
         whereTag = bs_data.find("query")  #izvadi mi ceo tag
-        where = whereTag.text #iyvadi mi tekst iz taga
-        whereTagNiz = where.split(";")
+        sql += " from " + resurs
 
-        sql += " from " + resurs + " where " 
-
-        for x in whereTagNiz:
-            sql += x + " and "
-
-        sql = sql[:-4]
-       
-
+        if (whereTag is not None):
+            where = whereTag.text #iyvadi mi tekst iz taga
+            whereTagNiz = where.split(";")
+            sql += " where "
+            for x in whereTagNiz:
+                 sql += x + " and "
+            sql = sql[:-4]
         return sql
 
     def DeleteMethod(self, x):
+
         with open(x, 'r') as f:
-            data = f.read() 
+            data = f.read()
+        bs_data = BeautifulSoup(data, 'xml')
+        resursTag = bs_data.find("noun")  
+        resurs = resursTag.text 
+        sql = "DELETE FROM " + resurs
 
-        # Passing the stored data inside the beautifulsoup parser 
-        bs_data = BeautifulSoup(data, 'xml') 
-        # Using find() to extract attributes of the first instance of the tag 
-        resursTag = bs_data.find("noun")  #izvadi mi ceo tag
-        resurs = resursTag.text #iyvadi mi tekst iz taga
+        whereTag = bs_data.find("query")  
 
-        sql = "DELETE FROM " + resurs + " WHERE "
+        if whereTag is not None:
 
-        whereTag = bs_data.find("query")  #izvadi mi ceo tag
-        where = whereTag.text #iyvadi mi tekst iz taga
-        whereTagNiz = where.split(";")
+            sql += " WHERE "
 
+            where = whereTag.text #iyvadi mi tekst iz taga
 
-        for x in whereTagNiz:
-            sql += x + " and "
+            whereTagNiz = where.split(";")
 
-        sql = sql[:-4]
-        print(sql)
+            for x in whereTagNiz:
+
+                sql += x + " and "
+
+            sql = sql[:-4]
 
         return sql
 
     def InsertMethod(self, x):
         with open(x, 'r') as f:
-                data = f.read() 
-
-        # Passing the stored data inside the beautifulsoup parser 
+            data = f.read() 
         bs_data = BeautifulSoup(data, 'xml') 
         # Using find() to extract attributes of the first instance of the tag 
         resursTag = bs_data.find("noun")  #izvadi mi ceo tag
@@ -101,28 +96,23 @@ class XMLDateBaseAdapter:
         # Using find() to extract attributes of the first instance of the tag 
         resursTag = bs_data.find("noun")  #izvadi mi ceo tag
         resurs = resursTag.text #iyvadi mi tekst iz taga
+       
 
-        returnTag = bs_data.find("fields")  #izvadi mi ceo tag
-        returnC = returnTag.text #iyvadi mi tekst iz taga
-        returnCNiz = returnC.split(";")
+        returnTag = bs_data.find_all('query') #izvadi mi ceo tag
+        set = returnTag[0].text
+        where = returnTag[1].text
+
+        setNiz = set.split(";")
+        #returnC = returnTag.text #iyvadi mi tekst iz taga
+        #returnCNiz = returnC.split(";")
 
         sql = "UPDATE " + resurs + " SET "
 
-        for x in returnCNiz:
+        for x in setNiz:
                 sql += x + ","
 
         sql = sql[:-1]
-        whereTag = bs_data.find("query")  #izvadi mi ceo tag
-        where = whereTag.text #iyvadi mi tekst iz taga
-        whereTagNiz = where.split(";")
-
-        sql +=" WHERE " 
-
-        for x in whereTagNiz:
-            sql += x + " and "
-
-        sql = sql[:-4]
-        print(sql)
+        sql +=" WHERE " + where
 
         return sql
 
@@ -154,6 +144,5 @@ class XMLDateBaseAdapter:
     
     def getResponse(self, x):
         result = self.fromXMLtoSQL(x)
-        list = self.repository.doQuery(result)
-        for row in list:
-            print(row)
+        [code, list] = self.repository.doQuery(result)
+       
