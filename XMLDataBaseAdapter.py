@@ -1,6 +1,6 @@
 #post insert into
 #patch alter table
-
+import xml.etree.ElementTree as xmlCreate
 from bs4 import BeautifulSoup
 class XMLDateBaseAdapter:
     def __init__(self, repository):
@@ -34,6 +34,7 @@ class XMLDateBaseAdapter:
             for x in whereTagNiz:
                  sql += x + " and "
             sql = sql[:-4]
+        sql += "; commit;"
         return sql
 
     def DeleteMethod(self, x):
@@ -60,7 +61,7 @@ class XMLDateBaseAdapter:
                 sql += x + " and "
 
             sql = sql[:-4]
-
+        sql += "; commit;"
         return sql
 
     def InsertMethod(self, x):
@@ -82,9 +83,7 @@ class XMLDateBaseAdapter:
             sql += niz[1] + ", "
 
         sql = sql[:-2]
-        sql += ")"
-        sql = sql[:-1]
-
+        sql += "); commit;"
         return sql
     
     def UpdateMethod(self, x):
@@ -112,7 +111,7 @@ class XMLDateBaseAdapter:
                 sql += x + ","
 
         sql = sql[:-1]
-        sql +=" WHERE " + where
+        sql +=" WHERE " + where + "; commit;"
 
         return sql
 
@@ -141,8 +140,3 @@ class XMLDateBaseAdapter:
             result = self.UpdateMethod(x)
 
         return result
-    
-    def getResponse(self, x):
-        result = self.fromXMLtoSQL(x)
-        [code, list] = self.repository.doQuery(result)
-       
