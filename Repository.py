@@ -12,6 +12,6 @@ class Repository:
 
         cur.execute(query)
 
-        list = cur.fatchall()
+        list = cur.fetchall()
 
         return list
