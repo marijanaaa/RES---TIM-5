@@ -1,9 +1,10 @@
+from ConnectSQL import ConnectToMySQL
 
-class Repository:
+class Repository(ConnectToMySQL):
 
-    def __init__(self, connection):
+    def __init__(self):
 
-        self.connection = connection.CreateConnection()
+        self.connection = ConnectToMySQL.CreateConnection(self)
 
 
 
@@ -11,6 +12,8 @@ class Repository:
 
         cur = self.connection.cursor()
 
-        executedQuery = cur.execute(query)
+        cur.execute(query)
 
-        return executedQuery
+        list = cur.fatchall()
+
+        return list
