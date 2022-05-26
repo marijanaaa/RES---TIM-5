@@ -1,10 +1,9 @@
-from ConnectSQL import ConnectToMySQL
 
-class Repository(ConnectToMySQL):
+class Repository:
 
-    def __init__(self):
+    def __init__(self, connection):
 
-        self.connection = ConnectToMySQL.CreateConnection(self)
+        self.connection = connection.CreateConnection()
 
 
 
