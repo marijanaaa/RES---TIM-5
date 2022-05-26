@@ -140,3 +140,33 @@ class XMLDateBaseAdapter:
             result = self.UpdateMethod(x)
 
         return result
+    
+    def getResponse(self, x):
+        result = self.fromXMLtoSQL(x)
+        [code, list] = self.repository.doQuery(result)
+        return self.fromSqlToXml(code, list)
+    def fromSqlToXml(self, code, list):
+        outputFile="outputFile.xml"
+        response=xmlCreate.Element("response")
+        status=xmlCreate.SubElement(response, "status")
+        if(code==3000):
+            status.text="REJECTED"
+        else:
+            status.text="SUCCESS"
+        status_code=xmlCreate.SubElement(response, "status_code")
+        status_code.text=str(code)
+        payload=xmlCreate.SubElement(response, "payload")
+        if(code==3000):
+            payload.text=list
+        else:
+            for i in list:
+                row=xmlCreate.SubElement(payload, "row")
+                for j in i:
+                    subrow=xmlCreate.SubElement(row, "subrow")
+                    subrow.text=str(j)
+        tree=xmlCreate.ElementTree(response)
+        with open(outputFile, "wb") as files :
+            tree.write(files)
+        return outputFile
+
+
