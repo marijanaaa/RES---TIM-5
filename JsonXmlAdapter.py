@@ -11,4 +11,5 @@ class JsonXmlAdapter:
             e.SubElement(r,"fields").text = d["fields"]
             a = e.ElementTree(r)
             a.write("json_to_xml.xml")
+            return "json_to_xml.xml"
 
