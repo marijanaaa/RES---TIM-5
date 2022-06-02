@@ -13,14 +13,17 @@ class JsonXmlAdapter:
         return "json_to_xml.xml"
     
     def XmlToJson(self, fileName):
-        with open(fileName, 'r') as f:
-            data = f.read()
-        bs_data = BeautifulSoup(data, 'xml')
-        statusTag = bs_data.find("status")  #izvadi mi ceo tag
-        status = statusTag.text #iyvadi mi tekst iz taga
-        status_codeTag = bs_data.find("status_code")  #izvadi mi ceo tag
+        with open(fileName, 'r') as file:
+            raw_data = file.read()
+        data = BeautifulSoup(raw_data, 'xml')
+
+        statusTag = data.find("status")
+        status = statusTag.text
+
+        status_codeTag = data.find("status_code")
         status_code=status_codeTag.text
-        payloadTag=bs_data.find("payload")
+        
+        payloadTag=data.find("payload")
         payload=payloadTag.text
 
         if(len(payload) == 0):
