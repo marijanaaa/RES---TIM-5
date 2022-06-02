@@ -1,151 +1,142 @@
-#post insert into
-#patch alter table
 import xml.etree.ElementTree as xmlCreate
 from bs4 import BeautifulSoup
 class XMLDateBaseAdapter:
     def __init__(self, repository):
         self.repository = repository
 
-    def GetMethod(self, x):
-        with open(x, 'r') as f:
-            data = f.read()
-        bs_data = BeautifulSoup(data, 'xml')
-        resursTag = bs_data.find("noun")  #izvadi mi ceo tag
-        resurs = resursTag.text #iyvadi mi tekst iz taga
-        returnTag = bs_data.find("fields")  #izvadi mi ceo tag
-        sql = "SELECT "
-        if (returnTag is None):
-            sql+="*"
+    def GetMethod(self, fileName):
+        with open(fileName, 'r') as file:
+            raw_data = file.read()
+        data = BeautifulSoup(raw_data, 'xml')
+
+        noun_tag = data.find("noun")
+        noun = noun_tag.text
+        fields_tag = data.find("fields")
+        sql_query = "SELECT "
+        if (fields_tag is None):
+            sql_query+="*"
 
         else:
-            returnC = returnTag.text #iyvadi mi tekst iz taga
+            fields = fields_tag.text
 
-            returnCNiz = returnC.split(";")
-            for x in returnCNiz:
-                sql += x + ","
-            sql = sql[:-1]
-        whereTag = bs_data.find("query")  #izvadi mi ceo tag
-        sql += " from " + resurs
+            fields_array = fields.split(";")
+            for x in fields_array:
+                sql_query += x + ","
+            sql_query = sql_query[:-1]
+        where_tag = data.find("query")
+        sql_query += " from " + noun
 
-        if (whereTag is not None):
-            where = whereTag.text #iyvadi mi tekst iz taga
-            whereTagNiz = where.split(";")
-            sql += " where "
-            for x in whereTagNiz:
-                 sql += x + " and "
-            sql = sql[:-4]
-        sql += "; commit;"
-        return sql
+        if (where_tag is not None):
+            where = where_tag.text
+            where_array = where.split(";")
+            sql_query += " where "
+            for x in where_array:
+                 sql_query += x + " and "
+            sql_query = sql_query[:-4]
+        sql_query += "; commit;"
+        return sql_query
 
-    def DeleteMethod(self, x):
+    def DeleteMethod(self, fileName):
 
-        with open(x, 'r') as f:
-            data = f.read()
-        bs_data = BeautifulSoup(data, 'xml')
-        resursTag = bs_data.find("noun")  
-        resurs = resursTag.text 
-        sql = "DELETE FROM " + resurs
+        with open(fileName, 'r') as file:
+            raw_data = file.read()
+        data = BeautifulSoup(raw_data, 'xml')
+        noun_tag = data.find("noun")  
+        noun = noun_tag.text 
+        sql_query = "DELETE FROM " + noun
 
-        whereTag = bs_data.find("query")  
+        where_tag = data.find("query")  
 
-        if whereTag is not None:
+        if where_tag is not None:
 
-            sql += " WHERE "
+            sql_query += " WHERE "
 
-            where = whereTag.text #iyvadi mi tekst iz taga
+            where = where_tag.text
 
-            whereTagNiz = where.split(";")
+            where_array = where.split(";")
 
-            for x in whereTagNiz:
+            for x in where_array:
 
-                sql += x + " and "
+                sql_query += x + " and "
 
-            sql = sql[:-4]
-        sql += "; commit;"
-        return sql
+            sql_query = sql_query[:-4]
+        sql_query += "; commit;"
+        return sql_query
 
-    def InsertMethod(self, x):
-        with open(x, 'r') as f:
-            data = f.read() 
-        bs_data = BeautifulSoup(data, 'xml') 
-        # Using find() to extract attributes of the first instance of the tag 
-        resursTag = bs_data.find("noun")  #izvadi mi ceo tag
-        resurs = resursTag.text #iyvadi mi tekst iz taga
+    def InsertMethod(self, fileName):
+        with open(fileName, 'r') as file:
+            raw_data = file.read() 
+        data = BeautifulSoup(raw_data, 'xml') 
+        noun_tag = data.find("noun")
+        noun = noun_tag.text
 
-        sql = "INSERT INTO " + resurs + " VALUES ( "
+        sql_query = "INSERT INTO " + noun + " VALUES ( "
 
-        whereTag = bs_data.find("query")  #izvadi mi ceo tag
-        where = whereTag.text #iyvadi mi tekst iz taga
-        whereTagNiz = where.split(";")
+        where_tag = data.find("query")
+        where = where_tag.text
+        where_array = where.split(";")
 
-        for x in whereTagNiz:
+        for x in where_array:
             niz = x.split("=")
-            sql += niz[1] + ", "
+            sql_query += niz[1] + ", "
 
-        sql = sql[:-2]
-        sql += "); commit;"
-        return sql
+        sql_query = sql_query[:-2]
+        sql_query += "); commit;"
+        return sql_query
     
-    def UpdateMethod(self, x):
-        with open(x, 'r') as f:
-            data = f.read() 
+    def UpdateMethod(self, fileName):
+        with open(fileName, 'r') as file:
+            raw_data = file.read() 
 
-        # Passing the stored data inside the beautifulsoup parser 
-        bs_data = BeautifulSoup(data, 'xml') 
-        # Using find() to extract attributes of the first instance of the tag 
-        resursTag = bs_data.find("noun")  #izvadi mi ceo tag
-        resurs = resursTag.text #iyvadi mi tekst iz taga
+        data = BeautifulSoup(raw_data, 'xml') 
+        noun_tag = data.find("noun")
+        noun = noun_tag.text
        
 
-        returnTag = bs_data.find_all('query') #izvadi mi ceo tag
-        set = returnTag[0].text
-        where = returnTag[1].text
+        query_tag = data.find_all('query')
+        set = query_tag[0].text
+        where = query_tag[1].text
 
-        setNiz = set.split(";")
-        #returnC = returnTag.text #iyvadi mi tekst iz taga
-        #returnCNiz = returnC.split(";")
+        set_array = set.split(";")
 
-        sql = "UPDATE " + resurs + " SET "
+        sql_query = "UPDATE " + noun + " SET "
 
-        for x in setNiz:
-                sql += x + ","
+        for x in set_array:
+                sql_query += x + ","
 
-        sql = sql[:-1]
-        sql +=" WHERE " + where + "; commit;"
+        sql_query = sql_query[:-1]
+        sql_query +=" WHERE " + where + "; commit;"
 
-        return sql
+        return sql_query
 
 
-    def fromXMLtoSQL(self, x):
+    def fromXMLtoSQL(self, fileName):
         
+        with open(fileName, 'r') as file:
+            raw_data = file.read() 
         
-        # Reading the data inside the xml file to a variable under the name  data
-        with open(x, 'r') as f:
-            data = f.read() 
-        
+        data = BeautifulSoup(raw_data, 'xml') 
 
-        # Passing the stored data inside the beautifulsoup parser 
-        bs_data = BeautifulSoup(data, 'xml') 
+        method_tag = data.find("verb")
+        method = method_tag.text
 
-        method = bs_data.find("verb")
-        methodText = method.text
-
-        if methodText == "GET":
-            result = self.GetMethod(x)
-        elif methodText == "DELETE":
-            result = self.DeleteMethod(x)
-        elif methodText == "POST":
-            result = self.InsertMethod(x)
-        elif methodText == "PATCH":
-            result = self.UpdateMethod(x)
+        if method == "GET":
+            result = self.GetMethod(fileName)
+        elif method == "DELETE":
+            result = self.DeleteMethod(fileName)
+        elif method == "POST":
+            result = self.InsertMethod(fileName)
+        elif method == "PATCH":
+            result = self.UpdateMethod(fileName)
 
         return result
     
-    def getResponse(self, x):
-        result = self.fromXMLtoSQL(x)
-        [code, list] = self.repository.doQuery(result)
-        return self.fromSqlToXml(code, list)
-    def fromSqlToXml(self, code, list):
+    def getResponse(self, fileName):
+        result = self.fromXMLtoSQL(fileName)
+        [code, data] = self.repository.doQuery(result)
+        return self.fromSqlToXml(code, data)
+
+    def fromSqlToXml(self, code, data):
         outputFile="outputFile.xml"
         response=xmlCreate.Element("response")
         status=xmlCreate.SubElement(response, "status")
@@ -157,9 +148,9 @@ class XMLDateBaseAdapter:
         status_code.text=str(code)
         payload=xmlCreate.SubElement(response, "payload")
         if(code==3000):
-            payload.text=list
+            payload.text=data
         else:
-            for i in list:
+            for i in data:
                 row=xmlCreate.SubElement(payload, "row")
                 for j in i:
                     subrow=xmlCreate.SubElement(row, "subrow")
@@ -167,6 +158,7 @@ class XMLDateBaseAdapter:
         tree=xmlCreate.ElementTree(response)
         with open(outputFile, "wb") as files :
             tree.write(files)
+            
         return outputFile
 
 
