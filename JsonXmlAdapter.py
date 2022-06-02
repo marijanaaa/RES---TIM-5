@@ -2,17 +2,15 @@ import json as j
 import xml.etree.cElementTree as e
 from bs4 import BeautifulSoup
 class JsonXmlAdapter:
-    def JsonToXml(self, filename):
-        with open(filename) as json_format_file:
-            d = j.load(json_format_file)
-            r = e.Element("request")
-            e.SubElement(r,"verb").text = d["verb"]
-            e.SubElement(r,"noun").text = d["noun"]
-            e.SubElement(r,"query").text = d["query"]
-            e.SubElement(r,"fields").text = d["fields"]
-            a = e.ElementTree(r)
-            a.write("json_to_xml.xml")
-            return "json_to_xml.xml"
+    def JsonToXml(self, jsonObject):
+        r = e.Element("request")
+        e.SubElement(r,"verb").text = jsonObject["verb"]
+        e.SubElement(r,"noun").text = jsonObject["noun"]
+        e.SubElement(r,"query").text = jsonObject["query"]
+        e.SubElement(r,"fields").text = jsonObject["fields"]
+        a = e.ElementTree(r)
+        a.write("json_to_xml.xml")
+        return "json_to_xml.xml"
     
     def XmlToJson(self, fileName):
         with open(fileName, 'r') as f:
