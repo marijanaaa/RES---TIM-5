@@ -33,10 +33,6 @@ class JsonXmlAdapter:
         }
 
         json_object=j.dumps(json_data, indent=3)
-
-        outputFile="xml_to_json.json";
-        with open(outputFile, "w") as file:
-            file.write(json_object)
         
-        return outputFile
+        return json_object
 
