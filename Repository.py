@@ -5,10 +5,10 @@ class Repository:
         self.connection = connection.CreateConnection()
 
     def doQuery(self,query):
-        cur = self.connection.cursor()
+        cursor = self.connection.cursor()
         try:
-            cur.execute(query)
-            list=cur.fetchall()
-            return [2000, list]
-        except (MySQLdb.Error,MySQLdb.Warning) as e:
-            return [3000, e.args[1]]
+            cursor.execute(query)
+            data=cursor.fetchall()
+            return [2000, data]
+        except (MySQLdb.Error,MySQLdb.Warning) as warning:
+            return [3000, warning.args[1]]
