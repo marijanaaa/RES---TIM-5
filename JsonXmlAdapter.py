@@ -27,7 +27,16 @@ class JsonXmlAdapter:
         status_code=status_codeTag.text
         
         payloadTag=data.find("payload")
-        payload=payloadTag.text
+        payload=''
+        if(status_code == 3000):
+            payload=payloadTag.text
+        else:
+            rows=data.findAll("row")
+            for x in rows:
+                subrows=x.findAll("subrow")
+                for y in subrows:
+                    payload+=y.text+" "
+                payload+="\n"
 
         if(len(payload) == 0):
             payload="Operation successfull"
