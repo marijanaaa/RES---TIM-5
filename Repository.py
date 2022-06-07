@@ -11,4 +11,6 @@ class Repository:
             data=cursor.fetchall()
             return [2000, data]
         except (MySQLdb.Error,MySQLdb.Warning) as warning:
+            if(warning.args[0] == 1064):
+                return [5000, warning.args[1]]
             return [3000, warning.args[1]]
