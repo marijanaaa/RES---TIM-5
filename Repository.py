@@ -23,8 +23,8 @@ def openConnection(repository):
     serverSocket.close()
 
 class Repository:
-    def __init__(self, connection):
-        self.connection = connection.CreateConnection()
+    def __init__(self):
+        self.connection = ConnectToMySQL()
 
     def doQuery(self,query):
         cursor = self.connection.cursor(MySQLdb.cursors.DictCursor)
@@ -53,7 +53,6 @@ class Repository:
             }
             return dict
 
-connection=ConnectToMySQL()
-repository=Repository(connection)
+repository=Repository()
 
 openConnection(repository)
