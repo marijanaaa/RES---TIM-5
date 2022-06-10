@@ -24,5 +24,49 @@ class TestWebClient(unittest.TestCase):
         response=Client()
         self.assertEqual(expected_query, response)
 
+    @patch('builtins.input')
+    def test_GetWithAll(self, m_input):
+        m_input.side_effect=['GET', 'radnik', 'ime=\'Ana\'', 'id']
+        expected_query={
+            "verb" : "GET",
+            "noun" : "radnik",
+            "query" : "ime=\'Ana\'",
+            "fields" : "id"
+        }
+        response=Client()
+        self.assertEqual(expected_query, response)
+    
+    @patch('builtins.input')
+    def test_GetWithoutFields(self, m_input):
+        m_input.side_effect=['GET', 'radnik', 'ime=\'Ana\'', '']
+        expected_query={
+            "verb" : "GET",
+            "noun" : "radnik",
+            "query" : "ime=\'Ana\'"
+        }
+        response=Client()
+        self.assertEqual(expected_query, response)
+
+    @patch('builtins.input')
+    def test_GetWithoutQuery(self, m_input):
+        m_input.side_effect=['GET', 'radnik', '', 'id']
+        expected_query={
+             "verb" : "GET",
+            "noun" : "radnik",
+            "fields" : "id"
+        }
+        response=Client()
+        self.assertEqual(expected_query, response)
+    
+    @patch('builtins.input')
+    def test_GetWithoutQueryAndFields(self, m_input):
+        m_input.side_effect=['GET', 'radnik', '', '']
+        expected_query={
+             "verb" : "GET",
+            "noun" : "radnik",
+        }
+        response=Client()
+        self.assertEqual(expected_query, response)
+
 if __name__ == '__main__':
     unittest.main()
