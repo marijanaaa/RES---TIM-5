@@ -67,6 +67,17 @@ class TestWebClient(unittest.TestCase):
         }
         response=Client()
         self.assertEqual(expected_query, response)
+    @patch('builtins.input')
+    def test_Update(self, m_input):
+        m_input.side_effect=['PATCH', 'radnik', 'ime=\'Anica\'', 'ime=\'Ana\'']
+        expected_query={
+            "verb" : "PATCH",
+            "noun" : "radnik",
+            "query" : "ime=\'Anica\'",
+            "fields" : "ime=\'Ana\'"
+        }
+        response=Client()
+        self.assertEqual(expected_query, response)
 
 if __name__ == '__main__':
     unittest.main()
