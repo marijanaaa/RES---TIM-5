@@ -27,7 +27,8 @@ class Repository:
         self.connection = ConnectToMySQL()
 
     def doQuery(self,query):
-        cursor = self.connection.cursor(MySQLdb.cursors.DictCursor)
+        #cursor = self.connection.cursor(MySQLdb.cursors.DictCursor)
+        cursor=self.connection.CreateConnection().cursor()
         
         try:
             cursor.execute(query)
