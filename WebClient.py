@@ -9,8 +9,10 @@ def conenctToServer(json_object):
     serverSocket.sendall(bytes(data, encoding="utf-8"))
     data=serverSocket.recv(1024)
     response=json.loads(data)
+    #print(response)
     serverSocket.close()
     printResponse(response)
+
 def printResponse(response):
     status=response['status']
     print(status)
@@ -22,10 +24,6 @@ def printResponse(response):
             for item in list:
                 data=item[1:-1]
                 print(data)
-                data_list=data.split(',')
-                for x in data_list:
-                    print(x, end="")
-                print()
     else:
         print(response['payload'])
 
