@@ -1,6 +1,8 @@
 import xml.etree.ElementTree as xmlCreate
 from bs4 import BeautifulSoup
 import socket
+import pickle
+import xmltodict
 from ConnectSQL import ConnectToMySQL
 from JsonXmlAdapter import JsonXmlAdapter
 
@@ -24,6 +26,8 @@ class XMLDateBaseAdapter:
         self.JsonXmlAdapter=jsonXmlAdapter
 
     def GetMethod(self, xml_obj):
+        print(xml_obj)
+
         data = BeautifulSoup(xml_obj, 'xml') 
         data = data.find("data")
         noun_tag = data.find("noun")
@@ -133,16 +137,24 @@ class XMLDateBaseAdapter:
     def getResponse(self, xml_obj):
         result = self.fromXMLtoSQL(xml_obj)
         data = self.connectToRepository(result)
-        return self.JsonXmlAdapter.JsonToXml(data)
+        
+        object = pickle.loads(data)
+        myDict ={
+            "data": object,
+        }
+
+        return xmltodict.unparse(myDict)
         
     def connectToRepository(self, result):
         s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
         s.connect(('localhost', 10004))
         s.sendall(bytes(result, "utf-8"))
         data = s.recv(1024)
+
         s.close()
-        return data.decode("utf-8")
+        return data
         
-jsonXmlAdapter = JsonXmlAdapter()
-xmlDB=XMLDateBaseAdapter(jsonXmlAdapter)
-openConnection(xmlDB)
+if __name__ == '__main__':        
+    jsonXmlAdapter = JsonXmlAdapter()
+    xmlDB=XMLDateBaseAdapter(jsonXmlAdapter)
+    openConnection(xmlDB)
