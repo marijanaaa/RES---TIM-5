@@ -15,13 +15,16 @@ def printResponse(response):
     print(status)
     if status == 'SUCCESS':
         list=response['payload']
-        for item in list:
-            data=item[1:-1]
-            print(data)
-            data_list=data.split(',')
-            for x in data_list:
-                print(x, end="")
-            print()
+        if isinstance(list, str):
+            print(list[1:-1])
+        else:
+            for item in list:
+                data=item[1:-1]
+                print(data)
+                data_list=data.split(',')
+                for x in data_list:
+                    print(x, end="")
+                print()
     else:
         print(response['payload'])
 
