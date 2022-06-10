@@ -27,29 +27,32 @@ class TestXMLDataBaseAdapter(unittest.TestCase):
         sql1 = "UPDATE radnik SET ime  = 'Anica'  WHERE ime='Ana'; commit;"
         self.assertEqual(retValue, sql1 )
 
-    def test_WithoutFields(self):
+    def test_GetWithoutFields(self):
         xml_obj = "<data><verb>GET</verb><noun>radnik</noun><query>ime=\"Ana\"</query></data>"
         sql_query = """SELECT * from radnik where ime=\"Ana\" ; commit;"""
         adapter = XMLDateBaseAdapter()
         self.assertEqual(adapter.GetMethod(xml_obj), sql_query)
     
-    def test_WithoutQueryAndFields(self):
+    def test_GetWithoutQueryAndFields(self):
         xml_obj = "<data><verb>GET</verb><noun>radnik</noun></data>"
         sql_query = """SELECT * from radnik; commit;"""
         adapter = XMLDateBaseAdapter()
         self.assertEqual(adapter.GetMethod(xml_obj), sql_query)
 
-    def test_WithAll(self):
+    def test_GetWithAll(self):
         xml_obj = "<data><verb>GET</verb><noun>radnik</noun><query>ime='Ana';jmbg=1</query><fields>id</fields></data>"
         sql_query = """SELECT id from radnik where ime='Ana' and jmbg=1 ; commit;"""
         adapter = XMLDateBaseAdapter()
         self.assertEqual(adapter.GetMethod(xml_obj), sql_query)
     
-    def test_WithoutQuery(self):
+    def test_GetWithoutQuery(self):
         xml_obj = "<data><verb>GET</verb><noun>radnik</noun><fields>id</fields></data>"
         sql_query = """SELECT id from radnik; commit;"""
         adapter = XMLDateBaseAdapter()
         self.assertEqual(adapter.GetMethod(xml_obj), sql_query)
+
+
+
 
 if __name__ == '__main__':
     unittest.main()
