@@ -2,7 +2,6 @@ import json
 import socket
 from sqlite3 import connect
 
-from flask import request
 def conenctToServer(json_object):
     serverSocket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
     serverSocket.connect(('localhost', 10005))
@@ -79,6 +78,7 @@ def Client():
     jsonRequest = json.loads(text)
     return jsonRequest
 
-while True:
-    request=Client()
-    conenctToServer(request)
+if __name__ == '__main__':
+    while True:
+        request=Client()
+        conenctToServer(request)
