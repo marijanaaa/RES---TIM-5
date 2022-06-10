@@ -1,8 +1,7 @@
 import MySQLdb
 import socket
 from ConnectSQL import ConnectToMySQL
-import json
-
+import pickle
 def openConnection(repository):
     serverSocket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
     serverSocket.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
@@ -16,9 +15,8 @@ def openConnection(repository):
 
         response=repository.doQuery(data.decode("utf-8"))
 
-        json_string = json.dumps(response)
-
-        clientConnection.sendall(bytes(json_string,encoding="utf-8"))
+        data = pickle.dumps(response)
+        clientConnection.sendall(data)
         clientConnection.close()
     serverSocket.close()
 
