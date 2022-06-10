@@ -20,7 +20,12 @@ class TestXMLDataBaseAdapter(unittest.TestCase):
         retValue = xmlDB.InsertMethod(xml)
         sql1 = "INSERT INTO radnik VALUES (  44,  Ana,  nesto,  111); commit;"
         self.assertEqual(retValue, sql1 )
-
+    def test_Update(self):
+        xml = "<data><verb>PATCH</verb><noun>radnik</noun><query>ime  = 'Anica' </query><fields>ime='Ana'</fields></data>"
+        xmlDB = XMLDateBaseAdapter()
+        retValue = xmlDB.UpdateMethod(xml)
+        sql1 = "UPDATE radnik SET ime  = 'Anica'  WHERE ime='Ana'; commit;"
+        self.assertEqual(retValue, sql1 )
 
 
 if __name__ == '__main__':
