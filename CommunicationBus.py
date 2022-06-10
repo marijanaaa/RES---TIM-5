@@ -21,15 +21,7 @@ def openConnection(communicationBus):
         dict = json.loads(data)
         isValid=False
         if "verb" in dict and "noun" in dict:
-            for verb in verbs:
-                if dict["verb"] == verb:
-                    isValid = True
-            if dict["verb"] == verbs[1]:
-                if "query" not in dict:
-                    isValid=False
-            elif dict["verb"] == verbs[2]:
-                if "query" not in dict or "fields" not in dict:
-                    isValid=False
+            isValid=returnIsValid(dict)
         else:
             response=badRequest()
 
@@ -40,6 +32,19 @@ def openConnection(communicationBus):
         clientConnection.sendall(bytes(response,encoding="utf-8"))
         clientConnection.close()
     serverSocket.close()
+
+def returnIsValid(dict):
+    isValid=False
+    for verb in verbs:
+        if dict["verb"] == verb:
+            isValid = True
+        if dict["verb"] == verbs[1]:
+            if "query" not in dict:
+                isValid=False
+        elif dict["verb"] == verbs[2]:
+            if "query" not in dict or "fields" not in dict:
+                isValid=False
+    return isValid
 
 def badRequest():
     json_response = {
