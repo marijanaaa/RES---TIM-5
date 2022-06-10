@@ -64,5 +64,6 @@ class CommunicationBus:
         data = s.recv(1024)
         s.close()
         return data.decode("utf-8")
-communicationBus= CommunicationBus()
-openConnection(communicationBus)
+if __name__ == '__main__': 
+    communicationBus= CommunicationBus()
+    openConnection(communicationBus)
