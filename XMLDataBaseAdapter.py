@@ -3,8 +3,6 @@ from bs4 import BeautifulSoup
 import socket
 import pickle
 import xmltodict
-from ConnectSQL import ConnectToMySQL
-from JsonXmlAdapter import JsonXmlAdapter
 
 def openConnection(xmlDataBaseAdapter):
     serverSocket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
@@ -22,8 +20,6 @@ def openConnection(xmlDataBaseAdapter):
     serverSocket.close()
 
 class XMLDateBaseAdapter:
-    def __init__(self, jsonXmlAdapter):
-        self.JsonXmlAdapter=jsonXmlAdapter
 
     def GetMethod(self, xml_obj):
         print(xml_obj)
@@ -155,6 +151,5 @@ class XMLDateBaseAdapter:
         return data
         
 if __name__ == '__main__':        
-    jsonXmlAdapter = JsonXmlAdapter()
-    xmlDB=XMLDateBaseAdapter(jsonXmlAdapter)
+    xmlDB=XMLDateBaseAdapter()
     openConnection(xmlDB)
