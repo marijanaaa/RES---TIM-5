@@ -16,8 +16,11 @@ def printResponse(response):
     if status == 'SUCCESS':
         list=response['payload']
         for item in list:
-            for key in item:
-                print(key + " : " + item[key])
+            data=item[1:-1]
+            print(data)
+            data_list=data.split(',')
+            for x in data_list:
+                print(x, end="")
             print()
     else:
         print(response['payload'])
