@@ -1,5 +1,6 @@
 import unittest
 from XMLDataBaseAdapter import XMLDateBaseAdapter
+from unittest.mock import MagicMock, patch
 
 class TestXMLDataBaseAdapter(unittest.TestCase):
     def test_Delete_withoutWhere(self):
@@ -50,6 +51,54 @@ class TestXMLDataBaseAdapter(unittest.TestCase):
         sql_query = """SELECT id from radnik; commit;"""
         adapter = XMLDateBaseAdapter()
         self.assertEqual(adapter.GetMethod(xml_obj), sql_query)
+    def test_Inser_in_fromXMLtoSQL(self):
+        xmlAdapter = XMLDateBaseAdapter()
+        xml = "<data><verb>POST</verb><noun>radnik</noun><query>jmbg = 44; ime  = Ana; opis = nesto; id_vrsta = 111</query></data>"
+        xmlAdapter.fromXMLtoSQL = MagicMock(return_value = "INSERT INTO radnik VALUES (  44,  Ana,  nesto,  111); commit;")
+        xmlAdapter.fromXMLtoSQL(xml)
+        xmlAdapter.fromXMLtoSQL.assert_called_with(xml)
+    def test_Update_in_fromXMLtoSQL(self):
+        xmlAdapter = XMLDateBaseAdapter()
+        xml = "<data><verb>PATCH</verb><noun>radnik</noun><query>ime  = 'Anica' </query><fields>ime='Ana'</fields></data>"
+        xmlAdapter.fromXMLtoSQL = MagicMock(return_value = "UPDATE radnik SET ime  = 'Anica'  WHERE ime='Ana'; commit;")
+        xmlAdapter.fromXMLtoSQL(xml)
+        xmlAdapter.fromXMLtoSQL.assert_called_with(xml)
+    def test_Delete_With_Where_in_fromXMLtoSQL(self):
+        xmlAdapter = XMLDateBaseAdapter()
+        xml = "<data><verb>DELETE</verb><noun>radnik</noun><query>ime='Ana';jmbg=12</query></data>"
+        xmlAdapter.fromXMLtoSQL = MagicMock(return_value = "DELETE FROM radnik WHERE ime='Ana' and jmbg=12 ; commit;")
+        xmlAdapter.fromXMLtoSQL(xml)
+        xmlAdapter.fromXMLtoSQL.assert_called_with(xml)
+    def test_Delete_Without_Where_in_fromXMLtoSQL(self):
+        xmlAdapter = XMLDateBaseAdapter()
+        xml = "<data><verb>DELETE</verb><noun>radnik</noun></data>"
+        xmlAdapter.fromXMLtoSQL = MagicMock(return_value = "DELETE FROM radnik; commit;")
+        xmlAdapter.fromXMLtoSQL(xml)
+        xmlAdapter.fromXMLtoSQL.assert_called_with(xml)
+    def test_Get_Without_Fields_fromXMLtoSQL(self):
+        xmlAdapter = XMLDateBaseAdapter()
+        xml = "<data><verb>GET</verb><noun>radnik</noun><query>ime=\"Ana\"</query></data>"
+        xmlAdapter.fromXMLtoSQL = MagicMock(return_value =  """SELECT * from radnik where ime=\"Ana\" ; commit;""")
+        xmlAdapter.fromXMLtoSQL(xml)
+        xmlAdapter.fromXMLtoSQL.assert_called_with(xml)
+    def test_Get_WithoutQueryAndFields_fromXMLtoSQL(self):
+        xmlAdapter = XMLDateBaseAdapter()
+        xml = "<data><verb>GET</verb><noun>radnik</noun></data>"
+        xmlAdapter.fromXMLtoSQL = MagicMock(return_value =  """SELECT * from radnik; commit;""")
+        xmlAdapter.fromXMLtoSQL(xml)
+        xmlAdapter.fromXMLtoSQL.assert_called_with(xml)
+    def test_Get_WithAll_fromXMLtoSQL(self):
+        xmlAdapter = XMLDateBaseAdapter()
+        xml = "<data><verb>GET</verb><noun>radnik</noun><query>ime='Ana';jmbg=1</query><fields>id</fields></data>"
+        xmlAdapter.fromXMLtoSQL = MagicMock(return_value =  """SELECT id from radnik where ime='Ana' and jmbg=1 ; commit;""")
+        xmlAdapter.fromXMLtoSQL(xml)
+        xmlAdapter.fromXMLtoSQL.assert_called_with(xml)
+    def test_Get_WithoutQuery_fromXMLtoSQL(self):
+        xmlAdapter = XMLDateBaseAdapter()
+        xml = "<data><verb>GET</verb><noun>radnik</noun><fields>id</fields></data>"
+        xmlAdapter.fromXMLtoSQL = MagicMock(return_value =  """SELECT id from radnik; commit;""")
+        xmlAdapter.fromXMLtoSQL(xml)
+        xmlAdapter.fromXMLtoSQL.assert_called_with(xml)
 
 
 
