@@ -79,5 +79,22 @@ class TestWebClient(unittest.TestCase):
         response=Client()
         self.assertEqual(expected_query, response)
 
+    @patch('builtins.input')
+
+    def test_Insert(self, m_input):
+
+        m_input.side_effect=['POST', 'radnik', 'jmbg=\'44\', ime=\'Ana\', opis=\'nesto\', id_vrsta=\'8\'']
+
+        expected_query={
+
+            "verb" : "POST",
+
+            "noun" : "radnik",
+
+            "query" : "jmbg=\'44\', ime=\'Ana\', opis=\'nesto\', id_vrsta=\'8\'",
+
+        }
+        response=Client()
+        self.assertEqual(expected_query, response)
 if __name__ == '__main__':
     unittest.main()
