@@ -22,8 +22,6 @@ def openConnection(xmlDataBaseAdapter):
 class XMLDateBaseAdapter:
 
     def GetMethod(self, xml_obj):
-        print(xml_obj)
-
         data = BeautifulSoup(xml_obj, 'xml') 
         data = data.find("data")
         noun_tag = data.find("noun")
