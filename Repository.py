@@ -54,6 +54,6 @@ class Repository:
             }
             return dict
 
-repository=Repository()
-
-openConnection(repository)
+if __name__ == '__main__': 
+    repository=Repository()
+    openConnection(repository)
