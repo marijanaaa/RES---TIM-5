@@ -1,28 +1,45 @@
 import xml.etree.ElementTree as xmlCreate
 from bs4 import BeautifulSoup
+import socket
+from ConnectSQL import ConnectToMySQL
+from JsonXmlAdapter import JsonXmlAdapter
+
+def openConnection(xmlDataBaseAdapter):
+    serverSocket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+    serverSocket.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
+    serverSocket.bind(('127.0.0.1', 10003))
+    serverSocket.listen(1)
+    while(1):
+        clientConnection, addr = serverSocket.accept();
+        data=clientConnection.recv(1024);
+        if not data:
+            break
+        response=xmlDataBaseAdapter.getResponse(data.decode("utf-8"))
+        clientConnection.sendall(bytes(response,encoding="utf-8"))
+    clientConnection.close()
+    serverSocket.close()
+
 class XMLDateBaseAdapter:
-    def __init__(self, repository):
-        self.repository = repository
+    def __init__(self, jsonXmlAdapter):
+        self.JsonXmlAdapter=jsonXmlAdapter
 
-    def GetMethod(self, fileName):
-        with open(fileName, 'r') as file:
-            raw_data = file.read()
-        data = BeautifulSoup(raw_data, 'xml')
-
+    def GetMethod(self, xml_obj):
+        data = BeautifulSoup(xml_obj, 'xml') 
+        data = data.find("data")
         noun_tag = data.find("noun")
         noun = noun_tag.text
         fields_tag = data.find("fields")
         sql_query = "SELECT "
+
         if (fields_tag is None):
             sql_query+="*"
-
         else:
             fields = fields_tag.text
-
             fields_array = fields.split(";")
             for x in fields_array:
                 sql_query += x + ","
             sql_query = sql_query[:-1]
+
         where_tag = data.find("query")
         sql_query += " from " + noun
 
@@ -33,45 +50,36 @@ class XMLDateBaseAdapter:
             for x in where_array:
                  sql_query += x + " and "
             sql_query = sql_query[:-4]
+
         sql_query += "; commit;"
         return sql_query
 
-    def DeleteMethod(self, fileName):
-
-        with open(fileName, 'r') as file:
-            raw_data = file.read()
-        data = BeautifulSoup(raw_data, 'xml')
+    def DeleteMethod(self, xml_obj):
+        data = BeautifulSoup(xml_obj, 'xml') 
+        data = data.find("data")
         noun_tag = data.find("noun")  
         noun = noun_tag.text 
         sql_query = "DELETE FROM " + noun
-
         where_tag = data.find("query")  
 
         if where_tag is not None:
-
             sql_query += " WHERE "
-
             where = where_tag.text
-
             where_array = where.split(";")
-
             for x in where_array:
-
                 sql_query += x + " and "
-
             sql_query = sql_query[:-4]
+
         sql_query += "; commit;"
+
         return sql_query
 
-    def InsertMethod(self, fileName):
-        with open(fileName, 'r') as file:
-            raw_data = file.read() 
-        data = BeautifulSoup(raw_data, 'xml') 
+    def InsertMethod(self, xml_obj):
+        data = BeautifulSoup(xml_obj, 'xml') 
+        data = data.find("data")
         noun_tag = data.find("noun")
         noun = noun_tag.text
-
         sql_query = "INSERT INTO " + noun + " VALUES ( "
-
         where_tag = data.find("query")
         where = where_tag.text
         where_array = where.split(";")
@@ -82,83 +90,59 @@ class XMLDateBaseAdapter:
 
         sql_query = sql_query[:-2]
         sql_query += "); commit;"
-        return sql_query
-    
-    def UpdateMethod(self, fileName):
-        with open(fileName, 'r') as file:
-            raw_data = file.read() 
 
-        data = BeautifulSoup(raw_data, 'xml') 
+        return sql_query
+
+    def UpdateMethod(self, xml_obj):
+        data = BeautifulSoup(xml_obj, 'xml') 
+        data = data.find("data")
         noun_tag = data.find("noun")
         noun = noun_tag.text
-       
-
-        query_tag = data.find_all('query')
-        set = query_tag[0].text
-        where = query_tag[1].text
-
+        query_tag = data.find('query')
+        set = query_tag.text
         set_array = set.split(";")
-
         sql_query = "UPDATE " + noun + " SET "
 
         for x in set_array:
                 sql_query += x + ","
 
         sql_query = sql_query[:-1]
+        where_tag=data.find('fields')
+        where=where_tag.text
         sql_query +=" WHERE " + where + "; commit;"
 
         return sql_query
-
-
-    def fromXMLtoSQL(self, fileName):
         
-        with open(fileName, 'r') as file:
-            raw_data = file.read() 
-        
-        data = BeautifulSoup(raw_data, 'xml') 
-
+    def fromXMLtoSQL(self, xml_obj):        
+        data = BeautifulSoup(xml_obj, 'xml') 
+        data = data.find("data")
         method_tag = data.find("verb")
         method = method_tag.text
 
         if method == "GET":
-            result = self.GetMethod(fileName)
+            result = self.GetMethod(xml_obj)
         elif method == "DELETE":
-            result = self.DeleteMethod(fileName)
+            result = self.DeleteMethod(xml_obj)
         elif method == "POST":
-            result = self.InsertMethod(fileName)
+            result = self.InsertMethod(xml_obj)
         elif method == "PATCH":
-            result = self.UpdateMethod(fileName)
+            result = self.UpdateMethod(xml_obj)
 
         return result
-    
-    def getResponse(self, fileName):
-        result = self.fromXMLtoSQL(fileName)
-        [code, data] = self.repository.doQuery(result)
-        return self.fromSqlToXml(code, data)
 
-    def fromSqlToXml(self, code, data):
-        outputFile="outputFile.xml"
-        response=xmlCreate.Element("response")
-        status=xmlCreate.SubElement(response, "status")
-        if(code==3000):
-            status.text="REJECTED"
-        else:
-            status.text="SUCCESS"
-        status_code=xmlCreate.SubElement(response, "status_code")
-        status_code.text=str(code)
-        payload=xmlCreate.SubElement(response, "payload")
-        if(code==3000):
-            payload.text=data
-        else:
-            for i in data:
-                row=xmlCreate.SubElement(payload, "row")
-                for j in i:
-                    subrow=xmlCreate.SubElement(row, "subrow")
-                    subrow.text=str(j)
-        tree=xmlCreate.ElementTree(response)
-        with open(outputFile, "wb") as files :
-            tree.write(files)
-            
-        return outputFile
-
-
+    def getResponse(self, xml_obj):
+        result = self.fromXMLtoSQL(xml_obj)
+        data = self.connectToRepository(result)
+        return self.JsonXmlAdapter.JsonToXml(data)
+        
+    def connectToRepository(self, result):
+        s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+        s.connect(('localhost', 10004))
+        s.sendall(bytes(result, "utf-8"))
+        data = s.recv(1024)
+        s.close()
+        return data.decode("utf-8")
+        
+jsonXmlAdapter = JsonXmlAdapter()
+xmlDB=XMLDateBaseAdapter(jsonXmlAdapter)
+openConnection(xmlDB)
