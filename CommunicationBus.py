@@ -51,8 +51,8 @@ def badRequest():
     return dict
 
 class CommunicationBus:
-    def __init__(self, jsonXmlAdapter):
-        self.JsonXmlAdapter=jsonXmlAdapter
+    def __init__(self,):
+        self.JsonXmlAdapter=JsonXmlAdapter()
     def ExecuteRequest(self, json_obj):
         xml_obj=self.JsonXmlAdapter.JsonToXml(json_obj)
         result=self.connectToAdapter(xml_obj)
@@ -64,6 +64,5 @@ class CommunicationBus:
         data = s.recv(1024)
         s.close()
         return data.decode("utf-8")
-jsonXmlAdapter = JsonXmlAdapter()
-communicationBus= CommunicationBus(jsonXmlAdapter)
+communicationBus= CommunicationBus()
 openConnection(communicationBus)
