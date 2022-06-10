@@ -1,6 +1,7 @@
 import unittest
 from unittest.mock import patch
-from WebClient import Client
+import unittest.mock as mock
+from WebClient import Client, printResponse
 import builtins
 
 class TestWebClient(unittest.TestCase):
@@ -96,5 +97,20 @@ class TestWebClient(unittest.TestCase):
         }
         response=Client()
         self.assertEqual(expected_query, response)
+
+    def test_printResponseError(self):
+        mock_print=mock.Mock(side_effect=lambda:(print("REJECTED\nBAD_FORMAT")))
+        response={'status_code': 5000, 'status': 'BAD_FORMAT', 'payload': 'Request is not valid'}
+        self.assertEquals(mock_print(), printResponse(response))
+
+    def test_printResponseSuccessSingle(self):
+        mock_print=mock.Mock(side_effect=lambda:(print("SUCCESS\n1003, 'Ana', 'Medicinski tehnicar  u odeljenju za ginekologiju', 2")))
+        response={'status_code': '2000', 'status': 'SUCCESS', 'payload': "(1003, 'Ana', 'Medicinski tehnicar  u odeljenju za ginekologiju', 2)"}
+        self.assertEqual(mock_print(), printResponse(response))
+
+    def test_printResponseSuccessMultiple(self):
+        mock_print=mock.Mock(side_effect=lambda:(print("SUCCESS\n1, 1003, 4566, 1\n2, 9699, 4566, 1")))
+        response={'status_code': '2000', 'status': 'SUCCESS', 'payload': ['(1, 1003, 4566, 1)', '(2, 9699, 4566, 1)']}
+        self.assertEqual(mock_print(), printResponse(response))
 if __name__ == '__main__':
     unittest.main()
