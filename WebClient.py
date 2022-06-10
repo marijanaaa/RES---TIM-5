@@ -44,7 +44,8 @@ def Client():
     if (option == "DELETE"):
         print("Enter values of the columns for filtering. Separate them with \";\".")
         values = input()
-        if values != None:
+        values=values.strip()
+        if values:
             text += ", \"query\":\"" + values + "\""
     elif (option == "GET"):
         print("Enter values of the columns for filtering. Separate them with \";\".")
