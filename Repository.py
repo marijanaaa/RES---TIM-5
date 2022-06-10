@@ -9,12 +9,11 @@ def openConnection(repository):
     serverSocket.bind(('localhost', 10004))
     serverSocket.listen(1)
     while(1):
-        clientConnection, addr = serverSocket.accept();
-        data=clientConnection.recv(1024);
+        clientConnection, addr = serverSocket.accept()
+        data=clientConnection.recv(1024)
         if not data:
             break
 
-        print("INPUT :", data.decode("utf-8"))
         response=repository.doQuery(data.decode("utf-8"))
 
         json_string = json.dumps(response)
