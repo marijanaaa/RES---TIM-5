@@ -1,3 +1,5 @@
+import socket
+import threading
 import unittest
 import json
 from CommunicationBus import badRequest, returnIsValid, CommunicationBus
@@ -47,6 +49,25 @@ class TestCommunicationBus(unittest.TestCase):
         expected_response = json.dumps({"status_code": "2000", "status": "SUCCESS", "payload": "(1003, 'Ana', 'Medicinski tehnicar  u odeljenju za ginekologiju', 2)"})
         comm.connectToAdapter=MagicMock(return_value = "<?xml version=\"1.0\" encoding=\"utf-8\"?>\n<data><status_code>2000</status_code><status>SUCCESS</status><payload>(1003, 'Ana', 'Medicinski tehnicar  u odeljenju za ginekologiju', 2)</payload></data>")
         self.assertEqual(comm.ExecuteRequest(jsonString), expected_response)
+    def fakeServerCB(self):
+        server_sock = socket.socket()
+        server_sock.bind(('localhost', 10003))
+        server_sock.listen(0)
+        server_sock.accept()
+        server_sock.close()
+    @patch('socket.socket')
+    def test_konekcijaCBToAdapter(self, mock_socketconstructor):
+        mock_socket=mock_socketconstructor.return_value
+        mock_socket.recv.return_value=bytes("<?xml version=\"1.0\" encoding=\"utf-8\"?>\n<data><status_code>2000</status_code><status>SUCCESS</status><payload>(1003, 'Ana', 'Medicinski tehnicar  u odeljenju za ginekologiju', 2)</payload></data>", encoding="utf-8")
+        server_thread = threading.Thread(target=self.fakeServerCB)
+        server_thread.start()
+    
+        xml_obj="<?xml version=\"1.0\" encoding=\"utf-8\"?>\n<data><verb>GET</verb><noun>radnik</noun><query>ime='Ana'</query></data>"
+        xml_returned = CommunicationBus.connectToAdapter(self, xml_obj);
+        expected_xml="<?xml version=\"1.0\" encoding=\"utf-8\"?>\n<data><status_code>2000</status_code><status>SUCCESS</status><payload>(1003, 'Ana', 'Medicinski tehnicar  u odeljenju za ginekologiju', 2)</payload></data>"
+        self.assertEqual(expected_xml, xml_returned)
+    
+        server_thread.join()
         
 
 if __name__ == '__main__':
