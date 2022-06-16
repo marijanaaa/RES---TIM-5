@@ -1,3 +1,5 @@
+import socket
+import threading
 import unittest
 from XMLDataBaseAdapter import XMLDateBaseAdapter
 from unittest.mock import MagicMock, patch
@@ -99,7 +101,25 @@ class TestXMLDataBaseAdapter(unittest.TestCase):
         xmlAdapter.fromXMLtoSQL = MagicMock(return_value =  """SELECT id from radnik; commit;""")
         xmlAdapter.fromXMLtoSQL(xml)
         xmlAdapter.fromXMLtoSQL.assert_called_with(xml)
-
+    def fakeServerXML(self):
+        server_sock = socket.socket()
+        server_sock.bind(('localhost', 10004))
+        server_sock.listen(0)
+        server_sock.accept()
+        server_sock.close()
+    @patch('socket.socket')
+    def test_konekcijaXMLtoRepository(self, mock_socketconstructor):
+        expected_return=bytes('\x80\x04\x95v\x00\x00\x00\x00\x00\x00\x00}\x94(\x8c\x0bstatus_code\x94M\xd0\x07\x8c\x06status\x94\x8c\x07SUCCESS\x94\x8c\x07payload\x94(M\xeb\x03\x8c\x03Ana\x94\x8c0Medicinski tehnicar  u odeljenju za ginekologiju\x94K\x02t\x94\x85\x94u.', encoding="utf-8")
+        mock_socket=mock_socketconstructor.return_value
+        mock_socket.recv.return_value=expected_return
+        server_thread = threading.Thread(target=self.fakeServerXML)
+        server_thread.start()
+    
+        result="SELECT * from radnik where ime='Ana' ; commit;"
+        returned_value = XMLDateBaseAdapter.connectToRepository(self, result);
+        self.assertEqual(expected_return, returned_value)
+    
+        server_thread.join()
 
 
 
