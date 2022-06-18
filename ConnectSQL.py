@@ -6,7 +6,7 @@ class ConnectToMySQL:
         self.password = 'hejhej1'
         self.database = 'bolnica'
 
-    def CreateConnection(self):
+    def create_connection(self):
         return MySQLdb.connect( host=self.hostname, user=self.username, passwd=self.password, db=self.database )
 
 
