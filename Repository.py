@@ -2,31 +2,31 @@ import MySQLdb
 import socket
 from ConnectSQL import ConnectToMySQL
 import pickle
-def openConnection(repository):
-    serverSocket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-    serverSocket.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
-    serverSocket.bind(('localhost', 10004))
-    serverSocket.listen(1)
+def open_connection(repository):
+    server_socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+    server_socket.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
+    server_socket.bind(('localhost', 10004))
+    server_socket.listen(1)
     while(1):
-        clientConnection, addr = serverSocket.accept()
-        data=clientConnection.recv(1024)
+        client_connection, addr = server_socket.accept()
+        data=client_connection.recv(1024)
         if not data:
             break
 
-        response=repository.doQuery(data.decode("utf-8"))
+        response=repository.do_query(data.decode("utf-8"))
 
         data = pickle.dumps(response)
-        clientConnection.sendall(data)
-        clientConnection.close()
-    serverSocket.close()
+        client_connection.sendall(data)
+        client_connection.close()
+    server_socket.close()
 
 class Repository:
     def __init__(self):
         self.connection = ConnectToMySQL()
 
-    def doQuery(self,query):
+    def do_query(self,query):
         #cursor = self.connection.cursor(MySQLdb.cursors.DictCursor)
-        cursor=self.connection.CreateConnection().cursor()
+        cursor=self.connection.create_connection().cursor()
         
         try:
             cursor.execute(query)
@@ -39,14 +39,14 @@ class Repository:
             }
             return dict
         except (MySQLdb.Error,MySQLdb.Warning) as warning:
-            statusCode = 3000
+            status_code = 3000
             status = "REJECTED"
             if(warning.args[0] == 1064):
-                statusCode = 5000
+                status_code = 5000
                 status = "BAD_FORMAT"
             
             dict = {
-                "status_code":statusCode,
+                "status_code":status_code,
                 "status":status,
                 "payload":warning.args[1],
             }
@@ -54,4 +54,4 @@ class Repository:
 
 if __name__ == '__main__': 
     repository=Repository()
-    openConnection(repository)
+    open_connection(repository)
