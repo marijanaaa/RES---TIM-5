@@ -4,24 +4,24 @@ import socket
 import pickle
 import xmltodict
 
-def openConnection(xmlDataBaseAdapter):
-    serverSocket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-    serverSocket.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
-    serverSocket.bind(('127.0.0.1', 10003))
-    serverSocket.listen(1)
+def open_connection(xml_database_adapter):
+    server_socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+    server_socket.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
+    server_socket.bind(('127.0.0.1', 10003))
+    server_socket.listen(1)
     while(1):
-        clientConnection, addr = serverSocket.accept();
-        data=clientConnection.recv(1024);
+        client_connection, addr = server_socket.accept();
+        data=client_connection.recv(1024);
         if not data:
             break
-        response=xmlDataBaseAdapter.getResponse(data.decode("utf-8"))
-        clientConnection.sendall(bytes(response,encoding="utf-8"))
-    clientConnection.close()
-    serverSocket.close()
+        response=xml_database_adapter.get_response(data.decode("utf-8"))
+        client_connection.sendall(bytes(response,encoding="utf-8"))
+    client_connection.close()
+    server_socket.close()
 
 class XMLDateBaseAdapter:
 
-    def GetMethod(self, xml_obj):
+    def get_method(self, xml_obj):
         data = BeautifulSoup(xml_obj, 'xml') 
         data = data.find("data")
         noun_tag = data.find("noun")
@@ -52,7 +52,7 @@ class XMLDateBaseAdapter:
         sql_query += "; commit;"
         return sql_query
 
-    def DeleteMethod(self, xml_obj):
+    def delete_method(self, xml_obj):
         data = BeautifulSoup(xml_obj, 'xml') 
         data = data.find("data")
         noun_tag = data.find("noun")  
@@ -72,7 +72,7 @@ class XMLDateBaseAdapter:
 
         return sql_query
 
-    def InsertMethod(self, xml_obj):
+    def insert_method(self, xml_obj):
         data = BeautifulSoup(xml_obj, 'xml') 
         data = data.find("data")
         noun_tag = data.find("noun")
@@ -91,7 +91,7 @@ class XMLDateBaseAdapter:
 
         return sql_query
 
-    def UpdateMethod(self, xml_obj):
+    def update_method(self, xml_obj):
         data = BeautifulSoup(xml_obj, 'xml') 
         data = data.find("data")
         noun_tag = data.find("noun")
@@ -111,35 +111,35 @@ class XMLDateBaseAdapter:
 
         return sql_query
         
-    def fromXMLtoSQL(self, xml_obj):        
+    def from_xml_to_sql(self, xml_obj):        
         data = BeautifulSoup(xml_obj, 'xml') 
         data = data.find("data")
         method_tag = data.find("verb")
         method = method_tag.text
 
         if method == "GET":
-            result = self.GetMethod(xml_obj)
+            result = self.get_method(xml_obj)
         elif method == "DELETE":
-            result = self.DeleteMethod(xml_obj)
+            result = self.delete_method(xml_obj)
         elif method == "POST":
-            result = self.InsertMethod(xml_obj)
+            result = self.insert_method(xml_obj)
         elif method == "PATCH":
-            result = self.UpdateMethod(xml_obj)
+            result = self.update_method(xml_obj)
 
         return result
 
-    def getResponse(self, xml_obj):
-        result = self.fromXMLtoSQL(xml_obj)
-        data = self.connectToRepository(result)
+    def get_response(self, xml_obj):
+        result = self.from_xml_to_sql(xml_obj)
+        data = self.connect_to_repository(result)
         
         object = pickle.loads(data)
-        myDict ={
+        my_dict ={
             "data": object,
         }
 
-        return xmltodict.unparse(myDict)
+        return xmltodict.unparse(my_dict)
         
-    def connectToRepository(self, result):
+    def connect_to_repository(self, result):
         s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
         s.connect(('localhost', 10004))
         s.sendall(bytes(result, "utf-8"))
@@ -149,5 +149,5 @@ class XMLDateBaseAdapter:
         return data
         
 if __name__ == '__main__':        
-    xmlDB=XMLDateBaseAdapter()
-    openConnection(xmlDB)
+    xml_db=XMLDateBaseAdapter()
+    open_connection(xml_db)
