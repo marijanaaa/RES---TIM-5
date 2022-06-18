@@ -19,13 +19,13 @@ def open_connection(communication_bus):
         if not data:
             break
         
-        response = ParseRequest(data, communication_bus)
+        response = parse_request(data, communication_bus)
 
         client_connection.sendall(bytes(response,encoding="utf-8"))
         client_connection.close()
     server_socket.close()
 
-def ParseRequest(data, communicationBus):
+def parse_request(data, communication_bus):
     dict = json.loads(data)
     is_valid=False
     if "verb" in dict and "noun" in dict:

@@ -3,7 +3,7 @@ import socket
 import threading
 import unittest
 import json
-from CommunicationBus import bad_request, return_is_valid, CommunicationBus
+from CommunicationBus import bad_request, return_is_valid, parse_request, CommunicationBus
 from JsonXmlAdapter import JsonXmlAdapter
 from unittest.mock import MagicMock, patch
 
@@ -27,7 +27,7 @@ class TestCommunicationBus(unittest.TestCase):
         server_thread.start()
     
         xml_obj="<?xml version=\"1.0\" encoding=\"utf-8\"?>\n<data><verb>GET</verb><noun>radnik</noun><query>ime='Ana'</query></data>"
-        xml_returned = CommunicationBus.connectToAdapter(self, xml_obj);
+        xml_returned = CommunicationBus.connect_to_adapter(self, xml_obj);
         expected_xml="<?xml version=\"1.0\" encoding=\"utf-8\"?>\n<data><status_code>2000</status_code><status>SUCCESS</status><payload>(1003, 'Ana', 'Medicinski tehnicar  u odeljenju za ginekologiju', 2)</payload></data>"
         self.assertEqual(expected_xml, xml_returned)
         server_thread.join()
@@ -39,7 +39,7 @@ class TestCommunicationBus(unittest.TestCase):
         expected_response = json.dumps({"status_code": "2000", "status": "SUCCESS", "payload": "(1003, 'Ana', 'Medicinski tehnicar  u odeljenju za ginekologiju', 2)"})
         comm.connectToAdapter=MagicMock(return_value = "<?xml version=\"1.0\" encoding=\"utf-8\"?>\n<data><status_code>2000</status_code><status>SUCCESS</status><payload>(1003, 'Ana', 'Medicinski tehnicar  u odeljenju za ginekologiju', 2)</payload></data>")
 
-        res = ParseRequest(data, comm)
+        res = parse_request(data, comm)
         
 
         

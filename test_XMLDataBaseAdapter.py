@@ -129,13 +129,13 @@ class TestXMLDataBaseAdapter(unittest.TestCase):
 
         mock_socket=mock_socketconstructor.return_value
         mock_socket.recv.return_value=expected_return
-        server_thread = threading.Thread(target=self.fakeServerXML)
+        server_thread = threading.Thread(target=self.fake_server_xml)
         server_thread.start()
 
         xml_obj = "<data><verb>GET</verb><noun>radnik</noun><query>ime='Ana'</query></data>"
         res = "<?xml version=\"1.0\" encoding=\"utf-8\"?><data><verb>GET</verb><noun>radnik</noun><query>ime='Ana'</query></data><?xml version=\"1.0\" encoding=\"utf-8\"?><data><status_code>2000</status_code><status>SUCCESS</status><payload>(1003, 'Ana', 'Medicinski tehnicar  u odeljenju za ginekologiju', 2)</payload></data>"
         x = XMLDateBaseAdapter()
-        value = x.getResponse(xml_obj)
+        value = x.get_response(xml_obj)
         self.assertNotEqual(value,res)
         server_thread.join()
 

@@ -16,6 +16,7 @@ def print_response(response):
     status=response['status']
     print(status)
     if status == 'SUCCESS':
+        print(response)
         list=response['payload']
         if isinstance(list, str):
             print(list[1:-1])
