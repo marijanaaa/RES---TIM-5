@@ -2,18 +2,17 @@ import json
 import socket
 from sqlite3 import connect
 
-def conenctToServer(json_object):
-    serverSocket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-    serverSocket.connect(('localhost', 10005))
+def conenct_to_server(json_object):
+    server_socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+    server_socket.connect(('localhost', 10005))
     data=json.dumps(json_object)
-    serverSocket.sendall(bytes(data, encoding="utf-8"))
-    data=serverSocket.recv(1024)
+    server_socket.sendall(bytes(data, encoding="utf-8"))
+    data=server_socket.recv(1024)
     response=json.loads(data)
-    #print(response)
-    serverSocket.close()
-    printResponse(response)
+    server_socket.close()
+    print_response(response)
 
-def printResponse(response):
+def print_response(response):
     status=response['status']
     print(status)
     if status == 'SUCCESS':
@@ -27,7 +26,7 @@ def printResponse(response):
     else:
         print(response['payload'])
 
-def Client():
+def client():
     print("Select an option: GET, POST, PATCH, DELETE.")
     text = "{ "
     option = input()
@@ -74,10 +73,10 @@ def Client():
         if conditions:
             text += ", \"fields\":\"" + conditions + "\""
     text += "}"
-    jsonRequest = json.loads(text)
-    return jsonRequest
+    json_request = json.loads(text)
+    return json_request
 
 if __name__ == '__main__':
     while True:
-        request=Client()
-        conenctToServer(request)
+        request=client()
+        conenct_to_server(request)
