@@ -15,8 +15,7 @@ def conenct_to_server(json_object):
 def print_response(response):
     status=response['status']
     print(status)
-    if status == 'SUCCESS':
-        print(response)
+    if status == 'SUCCESS' and "payload" in response:
         list=response['payload']
         if isinstance(list, str):
             print(list[1:-1])
@@ -25,7 +24,8 @@ def print_response(response):
                 data=item[1:-1]
                 print(data)
     else:
-        print(response['payload'])
+        if "payload" in response:
+            print(response['payload'])
 
 def client():
     print("Select an option: GET, POST, PATCH, DELETE.")
