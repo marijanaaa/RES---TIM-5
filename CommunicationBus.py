@@ -18,20 +18,26 @@ def openConnection(communicationBus):
         data=clientConnection.recv(1024);
         if not data:
             break
-        dict = json.loads(data)
-        isValid=False
-        if "verb" in dict and "noun" in dict:
-            isValid=returnIsValid(dict)
-        else:
-            response=badRequest()
+        
+        response = ParseRequest(data, communicationBus)
 
-        if isValid == False:
-            response = badRequest()
-        else:
-            response=communicationBus.ExecuteRequest(data.decode("utf-8"))
         clientConnection.sendall(bytes(response,encoding="utf-8"))
         clientConnection.close()
     serverSocket.close()
+
+def ParseRequest(data, communicationBus):
+    dict = json.loads(data)
+    isValid=False
+    if "verb" in dict and "noun" in dict:
+        isValid=returnIsValid(dict)
+    else:
+        response=badRequest()
+
+    if isValid == False:
+        response = badRequest()
+    else:
+        response=communicationBus.ExecuteRequest(data.decode("utf-8"))
+    return response
 
 def returnIsValid(dict):
     isValid=False

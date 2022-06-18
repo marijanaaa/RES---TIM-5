@@ -131,12 +131,10 @@ class XMLDateBaseAdapter:
     def getResponse(self, xml_obj):
         result = self.fromXMLtoSQL(xml_obj)
         data = self.connectToRepository(result)
-        
         object = pickle.loads(data)
         myDict ={
             "data": object,
         }
-
         return xmltodict.unparse(myDict)
         
     def connectToRepository(self, result):
@@ -144,7 +142,6 @@ class XMLDateBaseAdapter:
         s.connect(('localhost', 10004))
         s.sendall(bytes(result, "utf-8"))
         data = s.recv(1024)
-
         s.close()
         return data
         

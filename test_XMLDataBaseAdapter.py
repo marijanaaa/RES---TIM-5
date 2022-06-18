@@ -107,6 +107,7 @@ class TestXMLDataBaseAdapter(unittest.TestCase):
         server_sock.listen(0)
         server_sock.accept()
         server_sock.close()
+        
     @patch('socket.socket')
     def test_konekcijaXMLtoRepository(self, mock_socketconstructor):
         expected_return=bytes('\x80\x04\x95v\x00\x00\x00\x00\x00\x00\x00}\x94(\x8c\x0bstatus_code\x94M\xd0\x07\x8c\x06status\x94\x8c\x07SUCCESS\x94\x8c\x07payload\x94(M\xeb\x03\x8c\x03Ana\x94\x8c0Medicinski tehnicar  u odeljenju za ginekologiju\x94K\x02t\x94\x85\x94u.', encoding="utf-8")
@@ -121,6 +122,22 @@ class TestXMLDataBaseAdapter(unittest.TestCase):
     
         server_thread.join()
 
+    @patch('socket.socket')
+    def test_getResponse(self, mock_socketconstructor):
+        with open("test.bin", mode='rb') as file: 
+            expected_return = file.read()
+
+        mock_socket=mock_socketconstructor.return_value
+        mock_socket.recv.return_value=expected_return
+        server_thread = threading.Thread(target=self.fakeServerXML)
+        server_thread.start()
+
+        xml_obj = "<data><verb>GET</verb><noun>radnik</noun><query>ime='Ana'</query></data>"
+        res = "<?xml version=\"1.0\" encoding=\"utf-8\"?><data><verb>GET</verb><noun>radnik</noun><query>ime='Ana'</query></data><?xml version=\"1.0\" encoding=\"utf-8\"?><data><status_code>2000</status_code><status>SUCCESS</status><payload>(1003, 'Ana', 'Medicinski tehnicar  u odeljenju za ginekologiju', 2)</payload></data>"
+        x = XMLDateBaseAdapter()
+        value = x.getResponse(xml_obj)
+        self.assertNotEqual(value,res)
+        server_thread.join()
 
 
 if __name__ == '__main__':
