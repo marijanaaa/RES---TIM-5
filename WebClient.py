@@ -26,6 +26,8 @@ def print_response(response):
     else:
         if "payload" in response:
             print(response['payload'])
+    if "payload" not in response:
+        print("No data found for this request")
 
 def client():
     print("Select an option: GET, POST, PATCH, DELETE.")
