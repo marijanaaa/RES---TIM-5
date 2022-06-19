@@ -133,10 +133,10 @@ class TestXMLDataBaseAdapter(unittest.TestCase):
         server_thread.start()
 
         xml_obj = "<data><verb>GET</verb><noun>radnik</noun><query>ime='Ana'</query></data>"
-        res = "<?xml version=\"1.0\" encoding=\"utf-8\"?><data><verb>GET</verb><noun>radnik</noun><query>ime='Ana'</query></data><?xml version=\"1.0\" encoding=\"utf-8\"?><data><status_code>2000</status_code><status>SUCCESS</status><payload>(1003, 'Ana', 'Medicinski tehnicar  u odeljenju za ginekologiju', 2)</payload></data>"
-        x = XMLDateBaseAdapter()
-        value = x.get_response(xml_obj)
-        self.assertNotEqual(value,res)
+        expected_result = "<?xml version=\"1.0\" encoding=\"utf-8\"?><data><verb>GET</verb><noun>radnik</noun><query>ime='Ana'</query></data><?xml version=\"1.0\" encoding=\"utf-8\"?><data><status_code>2000</status_code><status>SUCCESS</status><payload>(1003, 'Ana', 'Medicinski tehnicar  u odeljenju za ginekologiju', 2)</payload></data>"
+        xml_data_base_adapter = XMLDateBaseAdapter()
+        result = xml_data_base_adapter.get_response(xml_obj)
+        self.assertNotEqual(result,expected_result)
         server_thread.join()
 
 
