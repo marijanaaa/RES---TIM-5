@@ -18,9 +18,8 @@ class TestCommunicationBus(unittest.TestCase):
     @patch('socket.socket')
     @patch("JsonXmlAdapter.JsonXmlAdapter")
     def test_ParseRequest(self,mock_JsonXMLAdapterConstructor,mock_socketconstructor):
-        dict = {'verb': 'GET', 'noun': 'radnik', 'query': "ime='Ana'"}
         data = b'{"verb": "GET", "noun": "radnik", "query": "ime=\'Ana\'"}'
-        odg = "{\"status_code\": \"2000\", \"status\": \"SUCCESS\", \"payload\": \"(1003, 'Ana', 'Medicinski tehnicar  u odeljenju za ginekologiju', 2)\"}"
+        expected_response_from_parse_request = "{\"status_code\": \"2000\", \"status\": \"SUCCESS\", \"payload\": \"(1003, 'Ana', 'Medicinski tehnicar  u odeljenju za ginekologiju', 2)\"}"
         mock_socket=mock_socketconstructor.return_value
         mock_socket.recv.return_value=bytes("<?xml version=\"1.0\" encoding=\"utf-8\"?>\n<data><status_code>2000</status_code><status>SUCCESS</status><payload>(1003, 'Ana', 'Medicinski tehnicar  u odeljenju za ginekologiju', 2)</payload></data>", encoding="utf-8")
         server_thread = threading.Thread(target=self.fakeServerCB2)
@@ -34,12 +33,13 @@ class TestCommunicationBus(unittest.TestCase):
 
         mock_json=mock_JsonXMLAdapterConstructor.return_value
         mock_json.JsonToXml.return_value="<?xml version=\"1.0\" encoding=\"utf-8\"?>\n<data><verb>GET</verb><noun>radnik</noun><query>ime='Ana'</query></data>"
-        comm=CommunicationBus()
+        communication_bus=CommunicationBus()
         jsonString = "{\"verb\": \"GET\",\"noun\": \"radnik\", \"query\":\"ime='Ana'\"}"
         expected_response = json.dumps({"status_code": "2000", "status": "SUCCESS", "payload": "(1003, 'Ana', 'Medicinski tehnicar  u odeljenju za ginekologiju', 2)"})
-        comm.connectToAdapter=MagicMock(return_value = "<?xml version=\"1.0\" encoding=\"utf-8\"?>\n<data><status_code>2000</status_code><status>SUCCESS</status><payload>(1003, 'Ana', 'Medicinski tehnicar  u odeljenju za ginekologiju', 2)</payload></data>")
+        communication_bus.connectToAdapter=MagicMock(return_value = "<?xml version=\"1.0\" encoding=\"utf-8\"?>\n<data><status_code>2000</status_code><status>SUCCESS</status><payload>(1003, 'Ana', 'Medicinski tehnicar  u odeljenju za ginekologiju', 2)</payload></data>")
 
-        res = parse_request(data, comm)
+        result = parse_request(data, communication_bus)
+        self.assertEqual(expected_response_from_parse_request, result)
         
 
         
